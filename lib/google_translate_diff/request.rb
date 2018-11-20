@@ -44,7 +44,7 @@ class GoogleTranslateDiff::Request
   # => [..., [["<b>", :markup], ["Good", :text], ...]]
   def tokens
     @tokens ||= texts.map do |value|
-      GoogleTranslateDiff::Tokenizer.tokenize(value)
+      GoogleTranslateDiff::Tokenizer.tokenize(value, pre_trained_language: from_language)
     end
   end
 
@@ -144,5 +144,20 @@ class GoogleTranslateDiff::Request
   # Markup should not contain control characters
   def fix_ascii(value)
     value.gsub(/[\u0000-\u001F]/, " ")
+  end
+
+  def from_language
+    case from
+    when "sv"
+      :swedish
+    when "en"
+      :english
+    when "de"
+      :german
+    when "es"
+      :spanish
+    else
+      nil
+    end
   end
 end

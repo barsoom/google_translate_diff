@@ -46,6 +46,5 @@ between revisions of long texts.
   spec.add_dependency "google-cloud-translate"
   spec.add_dependency "ox"
   spec.add_dependency "dry-initializer"
-  spec.add_dependency "punkt-segmenter"
 end
 # rubocop:enable Metrics/BlockLength

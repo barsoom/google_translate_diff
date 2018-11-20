@@ -1,11 +1,12 @@
 class GoogleTranslateDiff::Tokenizer < ::Ox::Sax
-  def initialize(source)
+  def initialize(source, opts)
     @pos = nil
     @source = source
     @tokens = nil
     @context = []
     @sequence = []
     @indicies = []
+    @pre_trained_language = opts.fetch(:pre_trained_language, nil)
   end
 
   def instruct(target)
@@ -66,9 +67,15 @@ class GoogleTranslateDiff::Tokenizer < ::Ox::Sax
     return [] if value.strip.empty?
 
     boundaries =
-      Punkt::SentenceTokenizer
-      .new(value)
-      .sentences_from_text(value)
+      if @pre_trained_language
+        Punkt::SentenceTokenizer
+        .new(@pre_trained_language)
+        .sentences_from_text(value)
+      else
+        Punkt::SentenceTokenizer
+        .new(value)
+        .sentences_from_text(value)
+      end
 
     return [[value, :text]] if boundaries.size == 1
 
@@ -115,9 +122,9 @@ class GoogleTranslateDiff::Tokenizer < ::Ox::Sax
   end
 
   class << self
-    def tokenize(value)
+    def tokenize(value, opts = {})
       return [] if value.nil?
-      tokenizer = new(value).tap do |h|
+      tokenizer = new(value, opts).tap do |h|
         Ox.sax_parse(h, StringIO.new(value), HTML_OPTIONS)
       end
       tokenizer.tokens
